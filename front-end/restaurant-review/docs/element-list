@@ -1,0 +1,6 @@
+com.example.restaurantreview
+com.example.restaurantreview.controllers
+com.example.restaurantreview.models
+com.example.restaurantreview.repositories
+com.example.restaurantreview.services
+com.example.restaurantreview.util
