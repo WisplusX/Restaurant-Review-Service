@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.example.restaurantreview"},{"l":"com.example.restaurantreview.controllers"},{"l":"com.example.restaurantreview.models"},{"l":"com.example.restaurantreview.repositories"},{"l":"com.example.restaurantreview.services"},{"l":"com.example.restaurantreview.util"}];updateSearchResults();
