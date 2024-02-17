@@ -1,4 +1,5 @@
 com.example.restaurantreview
+com.example.restaurantreview.config
 com.example.restaurantreview.controllers
 com.example.restaurantreview.models
 com.example.restaurantreview.repositories

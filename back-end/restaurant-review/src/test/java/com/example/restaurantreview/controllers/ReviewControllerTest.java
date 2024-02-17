@@ -2,6 +2,7 @@ package com.example.restaurantreview.controllers;
 
 import com.example.restaurantreview.models.Restaurant;
 import com.example.restaurantreview.models.Review;
+import com.example.restaurantreview.services.RestaurantService;
 import com.example.restaurantreview.services.ReviewService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -34,6 +35,8 @@ class ReviewControllerTest {
     private ReviewController reviewController;
     @Mock
     private ReviewService reviewService;
+    @Mock
+    private RestaurantService restaurantService;
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
@@ -72,6 +75,39 @@ class ReviewControllerTest {
         verify(reviewService, times(1)).findById(1);
     }
 
+    /**
+     * Тестирование обработчика GET запроса для получения всех отзывов по идентификатору ресторана.
+     *
+     * @throws Exception если произошла ошибка при выполнении HTTP запроса
+     */
+    @Test
+    void testGetAllReviewsByRestaurantId() throws Exception {
+        // Создание макетного объекта отзыва
+        Review mockReview = createMockReview();
+
+        // Создание списка с макетным отзывом
+        List<Review> list = Collections.singletonList(mockReview);
+
+        // Установка поведения макета для сервиса отзывов
+        when(reviewService.findAllByRestaurantId(anyInt())).thenReturn(list);
+
+        // Выполнение HTTP GET запроса и проверка результата
+        mockMvc.perform(get("/api/reviews/restaurant/{id}", 1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].text").value("Text"))
+                .andExpect(jsonPath("$[0].rating").value(3.0))
+                .andExpect(jsonPath("$[0].creationDate").exists());
+
+        // Проверка вызова метода сервиса с правильным идентификатором ресторана
+        verify(reviewService, times(1)).findAllByRestaurantId(1);
+    }
+
+    /**
+     * Тест метода getAllReviews.
+     *
+     * @throws Exception если произошла ошибка во время выполнения теста.
+     */
     @Test
     public void testGetAllReviews() throws Exception {
         // Создание макетного объекта отзыва
@@ -96,23 +132,47 @@ class ReviewControllerTest {
         verify(reviewService, times(1)).findAll();
     }
 
+    /**
+     * Тест метода createReview.
+     *
+     * @throws Exception если произошла ошибка во время выполнения теста.
+     */
     @Test
-    public void testCreateReview() throws Exception {
-        // Создание макетного объекта отзыва
-        Review mockReview1 = createMockReview();
+    void testCreateReview() throws Exception {
+        // Создание макетного объекта ресторана
+        Restaurant mockRestaurant = createMockRestaurant();
 
-        String jsonReview = objectMapper.writeValueAsString(mockReview1);
+        // Создание макетного объекта отзыва
+        Review mockReview = createMockReview();
+
+        // Идентификатор ресторана
+        int restaurantId = 1;
+
+        // Преобразование макетного отзыва в JSON строку
+        String jsonReview = objectMapper.writeValueAsString(mockReview);
+
+        // Установка поведения макета для метода сервиса ресторанов
+        when(restaurantService.findById(restaurantId)).thenReturn(Optional.of(mockRestaurant));
 
         // Выполнение HTTP POST запроса и проверка результата
         mockMvc.perform(post("/api/reviews")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .param("restaurantId", String.valueOf(restaurantId))
                         .content(jsonReview))
                 .andExpect(status().isCreated());
 
-        // Проверка вызова метода сервиса отзывов
-        verify(reviewService, times(1)).save(mockReview1);
+        // Проверка вызова метода сервиса отзывов для сохранения отзыва
+        verify(reviewService, times(1)).save(any(Review.class));
     }
 
+
+
+
+    /**
+     * Тест метода updateReview.
+     *
+     * @throws Exception если произошла ошибка во время выполнения теста.
+     */
     @Test
     public void testUpdateReview() throws Exception {
         // Создание макетного объекта отзыва
@@ -133,6 +193,11 @@ class ReviewControllerTest {
         verify(reviewService, times(1)).update(1, mockReview1);
     }
 
+    /**
+     * Тест метода deleteReview.
+     *
+     * @throws Exception если произошла ошибка во время выполнения теста.
+     */
     @Test
     public void testDeleteReview() throws Exception {
         // Установка поведения макета для сервиса отзывов
@@ -161,5 +226,23 @@ class ReviewControllerTest {
         mockReview.setAuthorEmail("john@example.com");
         mockReview.setCreationDate(LocalDateTime.now());
         return mockReview;
+    }
+
+    /**
+     * Создание макетного объекта ресторана для использования в тестах.
+     *
+     * @return макетный объект ресторана
+     */
+    private Restaurant createMockRestaurant() {
+        Restaurant mockRestaurant = new Restaurant();
+        mockRestaurant.setId(1);
+        mockRestaurant.setName("Restaurant");
+        mockRestaurant.setDescription("Desc");
+        mockRestaurant.setLocation("Location");
+        mockRestaurant.setAvgRating(3.5);
+        mockRestaurant.setPhoto("Photo URL");
+        mockRestaurant.setCuisine("Greece");
+        mockRestaurant.setPriceRange("$$$$");
+        return mockRestaurant;
     }
 }

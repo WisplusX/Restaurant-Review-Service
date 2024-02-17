@@ -46,10 +46,20 @@ public class ReviewService {
     }
 
     /**
-     * Метод для обновления информации о отзыве.
+     * Получает список всех отзывов для указанного ресторана, с сортировкой по дате создания в порядке убывания.
+     *
+     * @param id идентификатор ресторана
+     * @return список отзывов для указанного ресторана, отсортированный по дате создания в порядке убывания
+     */
+    public List<Review> findAllByRestaurantId(int id) {
+        return reviewRepository.findAllByRestaurantIdOrderByCreationDateDesc(id);
+    }
+
+    /**
+     * Метод для обновления информации об отзыве.
      *
      * @param id идентификатор отзыва, который нужно обновить.
-     * @param review новая информация о отзыве.
+     * @param review новая информация об отзыве.
      * @return обновленный отзыв (если существует).
      */
     public Optional<Review> update(int id, Review review) {

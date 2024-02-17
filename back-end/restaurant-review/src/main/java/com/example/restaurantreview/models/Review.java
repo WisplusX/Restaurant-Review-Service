@@ -27,11 +27,9 @@ public class Review {
     @Column(name = "rating")
     private int rating;
 
-    @NotNull(message = "Creation date is required")
     @Column(name = "creation_date")
     private LocalDateTime creationDate;
 
-    @NotNull(message = "Restaurant ID is required")
     @ManyToOne
     @JoinColumn(name = "restaurant_id")
     private Restaurant restaurant;

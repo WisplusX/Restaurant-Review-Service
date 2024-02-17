@@ -2,19 +2,16 @@ package com.example.restaurantreview.services;
 
 import com.example.restaurantreview.models.Restaurant;
 import com.example.restaurantreview.repositories.RestaurantRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -44,7 +41,7 @@ class RestaurantServiceTest {
     @Test
     void testFindById_notFound_returnsOptionalEmpty() {
         when(restaurantRepository.findById(1)).thenReturn(Optional.empty());
-        Assertions.assertFalse(restaurantService.findById(1).isPresent());
+        assertFalse(restaurantService.findById(1).isPresent());
     }
 
     /**
@@ -71,9 +68,11 @@ class RestaurantServiceTest {
 
         List<Restaurant> list = Collections.singletonList(mockRestaurant);
 
-        when(restaurantRepository.findAll()).thenReturn(list);
+        Sort sort = Sort.by(Sort.Direction.ASC, "avgRating");
 
-        assertEquals(list, restaurantService.findAll());
+        when(restaurantRepository.findAll(sort)).thenReturn(list);
+
+        assertEquals(list, restaurantService.findAll(sort));
     }
 
     /**

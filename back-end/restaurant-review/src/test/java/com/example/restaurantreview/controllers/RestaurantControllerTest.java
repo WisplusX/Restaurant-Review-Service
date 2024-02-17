@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -84,7 +85,7 @@ class RestaurantControllerTest {
         List<Restaurant> list = Collections.singletonList(mockRestaurant);
 
         // Установка поведения макета для сервиса ресторана
-        when(restaurantService.findAll()).thenReturn(list);
+        when(restaurantService.findAll(any(Sort.class))).thenReturn(list);
 
         // Выполнение HTTP GET запроса и проверка результата
         mockMvc.perform(get("/api/restaurants"))
@@ -99,8 +100,41 @@ class RestaurantControllerTest {
                 .andExpect(jsonPath("$[0].priceRange").value("$$$$"));
 
         // Проверка вызова метода сервиса
-        verify(restaurantService, times(1)).findAll();
+        verify(restaurantService, times(1)).findAll(any(Sort.class));
     }
+
+    /**
+     * Тест метода getRestaurantsByPopularity.
+     *
+     * @throws Exception если произошла ошибка во время выполнения теста.
+     */
+    @Test
+    void testGetRestaurantsByPopularity() throws Exception {
+        // Создание макетного объекта ресторана
+        Restaurant mockRestaurant = createMockRestaurant();
+
+        // Создание списка с макетным рестораном
+        List<Restaurant> list = Collections.singletonList(mockRestaurant);
+
+        // Установка поведения макета для сервиса ресторана
+        when(restaurantService.findAllByPopularity()).thenReturn(list);
+
+        // Выполнение HTTP GET запроса и проверка результата
+        mockMvc.perform(get("/api/restaurants/popular"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("Restaurant"))
+                .andExpect(jsonPath("$[0].description").value("Desc"))
+                .andExpect(jsonPath("$[0].location").value("Location"))
+                .andExpect(jsonPath("$[0].avgRating").value(3.5))
+                .andExpect(jsonPath("$[0].photo").value("Photo URL"))
+                .andExpect(jsonPath("$[0].cuisine").value("Greece"))
+                .andExpect(jsonPath("$[0].priceRange").value("$$$$"));
+
+        // Проверка вызова метода сервиса
+        verify(restaurantService, times(1)).findAllByPopularity();
+    }
+
 
     /**
      * Тест метода createRestaurant.
